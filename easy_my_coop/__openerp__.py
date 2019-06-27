@@ -20,8 +20,9 @@
 ##############################################################################
 {
     "name": "Easy My Coop",
-    "version": "9.0.1.3.1",
+    "version": "9.1.0.0.1",
     "depends": ["base",
+                'auth_signup',
                 "sale",
                 "purchase",
                 "account_accountant",
@@ -56,6 +57,7 @@
         'view/cooperator_register_view.xml',
         'view/operation_request_view.xml',
         'view/account_invoice_view.xml',
+        'view/auth_signup_template.xml',
         'view/subscription_template.xml',
         'view/product_view.xml',
         'view/res_company_view.xml',
