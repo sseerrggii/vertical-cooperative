@@ -15,7 +15,7 @@ from openerp.exceptions import ValidationError
 
 _logger = logging.getLogger(__name__)
 
-FORM_FIELDS = ['login', 'name', 'password', 'phone', 'street',
+FORM_FIELDS = ['login', 'firstname', 'password', 'phone', 'street',
                'city', 'zip_code', 'country_id']
 
 
@@ -43,6 +43,8 @@ class AuthSignupHome(AuthSignupHome):
                            in lang_obj.sudo().search_read([], ['code'])]
         if request.lang in supported_langs:
             values['lang'] = request.lang
+        values['lastname'] = qcontext.get('name')
+        values['name'] = values.get('firstname') + ' ' + values.get('lastsname')
         values['zip'] = values['zip_code']
         uid = self._signup_with_values(qcontext.get('token'), values)
         iban = qcontext.get('iban')

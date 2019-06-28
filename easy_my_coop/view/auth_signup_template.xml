@@ -2,7 +2,20 @@
 <odoo>
 	<data>
 		<template id="easy_my_coop_auth_fields" inherit_id="auth_signup.fields" name="Auth Signup/ResetPassword form fields">
-			<xpath expr="//div[@class='form-group field-name']" position="after">
+			<xpath expr="//input[@name='name']/.." position="before">
+				<div class="form-group field-name">
+	                <label for="firstname" class="control-label">Your firstname</label>
+	                <input type="text" name="firstname" t-att-value="firstname" id="firstname" class="form-control" placeholder="John"
+	                    required="required" t-att-readonly="'readonly' if only_passwords else None" />
+	            </div>			
+			</xpath>
+			<xpath expr="//label[@for='name']" position="replace">
+				<label for="name" class="control-label">Your lastname</label>
+			</xpath>
+			<xpath expr="//input[@name='name']" position="attributes">
+				<attribute name="placeholder">Doe</attribute>
+			</xpath>
+			<xpath expr="//input[@name='name']/.." position="after">
 	            <div class="form-group field-name">
 	                <label for="iban" class="control-label">IBAN number</label>
 	                <input type="text" name="iban" t-att-value="iban" id="iban" class="form-control" placeholder="BE645215965478"
