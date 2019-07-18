@@ -16,7 +16,7 @@ from openerp.exceptions import ValidationError
 _logger = logging.getLogger(__name__)
 
 FORM_FIELDS = ['login', 'firstname', 'password', 'phone', 'street',
-               'city', 'zip_code', 'country_id']
+               'city', 'zip_code', 'country_id', 'gender', 'birthdate']
 
 
 class AuthSignupHome(AuthSignupHome):
@@ -43,8 +43,10 @@ class AuthSignupHome(AuthSignupHome):
                            in lang_obj.sudo().search_read([], ['code'])]
         if request.lang in supported_langs:
             values['lang'] = request.lang
-        values['lastname'] = qcontext.get('name')
-        values['name'] = values.get('firstname') + ' ' + values.get('lastsname')
+        firstname = qcontext.get("firstname").title()
+        lastname = qcontext.get('name').upper()
+        values['lastname'] = lastname
+        values['name'] = firstname + ' ' + lastname
         values['zip'] = values['zip_code']
         uid = self._signup_with_values(qcontext.get('token'), values)
         iban = qcontext.get('iban')
@@ -58,7 +60,11 @@ class AuthSignupHome(AuthSignupHome):
         qcontext = self.get_auth_signup_qcontext()
         users_obj = request.env["res.users"]
         country_obj = request.env['res.country']
+        sub_req_obj = request.env['subscription.request']
 
+        if qcontext.get("login") != qcontext.get("confirm_email"):
+            qcontext["error"] = _("The email address doesn't seem to match"
+                                  " the email confirmation.")
         if qcontext.get("login", False) and not tools.single_email_re.match(qcontext.get("login", "")):
             qcontext["error"] = _("That does not seem to be an email address.")
         if qcontext.get("iban", False):
@@ -87,5 +93,8 @@ class AuthSignupHome(AuthSignupHome):
             qcontext['delivery_point_id'] = 0
         qcontext['countries'] = country_obj.sudo().search([])
         qcontext['country_id'] = '21'
+        fields_desc = sub_req_obj.sudo().fields_get(['company_type', 'gender'])
+        qcontext['company_types'] = fields_desc['company_type']['selection']
+        qcontext['genders'] = fields_desc['gender']['selection']
 
         return request.render('auth_signup.signup', qcontext)

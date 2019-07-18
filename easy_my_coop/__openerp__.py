@@ -30,6 +30,7 @@
                 "partner_firstname",
                 "partner_contact_birthdate",
                 "partner_contact_address",
+                "web",
                 "website",
                 "website_recaptcha_reloaded",
                 "theme_light",
