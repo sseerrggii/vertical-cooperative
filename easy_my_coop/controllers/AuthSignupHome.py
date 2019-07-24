@@ -41,8 +41,7 @@ class AuthSignupHome(AuthSignupHome):
         assert values.get('password') == qcontext.get('confirm_password'), "Passwords do not match; please retype them."
         supported_langs = [lang['code'] for lang
                            in lang_obj.sudo().search_read([], ['code'])]
-        if request.lang in supported_langs:
-            values['lang'] = request.lang
+        values['lang'] = qcontext.get("lang")
         firstname = qcontext.get("firstname").title()
         lastname = qcontext.get('name').upper()
         values['lastname'] = lastname
@@ -55,12 +54,23 @@ class AuthSignupHome(AuthSignupHome):
                                 'acc_number': iban})
         request.cr.commit()
 
+    @http.route('/web/company_signup', type='http', auth='public', website=True)
+    def web_auth_company_signup(self, *args, **kw):
+        qcontext = request.params.copy()
+        qcontext['company'] = True
+        return self.web_auth_signup()
+
     @http.route('/web/signup', type='http', auth='public', website=True)
     def web_auth_signup(self, *args, **kw):
         qcontext = self.get_auth_signup_qcontext()
         users_obj = request.env["res.users"]
         country_obj = request.env['res.country']
+        lang_obj = request.env['res.lang']
         sub_req_obj = request.env['subscription.request']
+
+        render_template = 'auth_signup.signup'
+        if qcontext.get('company', False):
+            render_template = 'auth_signup.company_signup'
 
         if qcontext.get("login") != qcontext.get("confirm_email"):
             qcontext["error"] = _("The email address doesn't seem to match"
@@ -87,14 +97,11 @@ class AuthSignupHome(AuthSignupHome):
                 else:
                     _logger.error(e.message)
                     qcontext['error'] = _("Could not create a new account.")
-        if not qcontext.get('raliment_point_id', False):
-            qcontext['raliment_point_id'] = 0
-        if not qcontext.get('delivery_point_id', False):
-            qcontext['delivery_point_id'] = 0
+        qcontext['langs'] = lang_obj.sudo().search([])
         qcontext['countries'] = country_obj.sudo().search([])
         qcontext['country_id'] = '21'
         fields_desc = sub_req_obj.sudo().fields_get(['company_type', 'gender'])
         qcontext['company_types'] = fields_desc['company_type']['selection']
         qcontext['genders'] = fields_desc['gender']['selection']
-
-        return request.render('auth_signup.signup', qcontext)
+        
+        return request.render(render_template, qcontext)
