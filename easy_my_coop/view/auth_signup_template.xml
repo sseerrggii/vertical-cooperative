@@ -292,7 +292,7 @@
 							required="True" style="width:54%"
 							t-att-disabled="'disabled' if only_passwords else None">
 							<option value=""></option>
-							<t t-foreach="company_types or []" t-as="type">
+							<t t-foreach="genders or []" t-as="type">
 								<option t-att-value="type[0]"
 									t-att-selected="type[0] == gender">
 									<t t-esc="type[1]" />
