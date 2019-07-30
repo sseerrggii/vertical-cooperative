@@ -54,11 +54,19 @@ class AuthSignupHome(AuthSignupHome):
                                 'acc_number': iban})
         request.cr.commit()
 
-    @http.route('/web/company_signup', type='http', auth='public', website=True)
+    @http.route('/web/company_signup', type='http', auth='public',
+                website=True)
     def web_auth_company_signup(self, *args, **kw):
-        qcontext = request.params.copy()
-        qcontext['company'] = True
-        return self.web_auth_signup()
+        vals = {}
+        vals['company'] = True
+        return self.web_auth_signup(**vals)
+
+    @http.route('/web/individual_signup', type='http', auth='public',
+                website=True)
+    def web_auth_individua_signup(self, *args, **kw):
+        vals = {}
+        vals['company'] = False
+        return self.web_auth_signup(**vals)
 
     @http.route('/web/signup', type='http', auth='public', website=True)
     def web_auth_signup(self, *args, **kw):
@@ -69,8 +77,8 @@ class AuthSignupHome(AuthSignupHome):
         sub_req_obj = request.env['subscription.request']
 
         render_template = 'auth_signup.signup'
-        if qcontext.get('company', False):
-            render_template = 'auth_signup.company_signup'
+        if kw.get('company', False):
+            render_template = 'easy_my_coop.company_signup'
 
         if qcontext.get("login") != qcontext.get("confirm_email"):
             qcontext["error"] = _("The email address doesn't seem to match"
@@ -103,5 +111,5 @@ class AuthSignupHome(AuthSignupHome):
         fields_desc = sub_req_obj.sudo().fields_get(['company_type', 'gender'])
         qcontext['company_types'] = fields_desc['company_type']['selection']
         qcontext['genders'] = fields_desc['gender']['selection']
-        
+
         return request.render(render_template, qcontext)
