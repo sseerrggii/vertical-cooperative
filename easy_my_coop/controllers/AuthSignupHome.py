@@ -79,6 +79,15 @@ class AuthSignupHome(AuthSignupHome):
         render_template = 'auth_signup.signup'
         if kw.get('company', False):
             render_template = 'easy_my_coop.company_signup'
+            qcontext['is_company'] = True
+            qcontext['name'] = self.company_name
+            qcontext['last_name'] = self.company_name
+            qcontext['company_register_number'] = self.company_register_number
+            qcontext['email'] = self.company_email
+
+        qcontext['out_inv_comm_type'] = 'bba'
+        qcontext['cooperator'] = True
+        qcontext['out_inv_comm_algorithm'] = 'random'
 
         if qcontext.get("login") != qcontext.get("confirm_email"):
             qcontext["error"] = _("The email address doesn't seem to match"
@@ -113,3 +122,10 @@ class AuthSignupHome(AuthSignupHome):
         qcontext['genders'] = fields_desc['gender']['selection']
 
         return request.render(render_template, qcontext)
+
+    def get_partner_company_vals(self):
+        partner_vals = {
+                        'data_policy_approved': self.data_policy_approved,
+                        'internal_rules_approved': self.internal_rules_approved
+                        }
+        return partner_vals
