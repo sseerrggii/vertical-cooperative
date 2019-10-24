@@ -302,14 +302,17 @@ class WebsiteSubscription(http.Controller):
                 methods=['POST'], website=True)
     def get_share_product(self, share_product_id, **kw):
         product_template = request.env['product.template']
-        product = product_template.sudo().browse(int(share_product_id))
-        return {
-            product.id: {
-                'list_price': product.list_price,
-                'min_qty': product.minimum_quantity,
-                'force_min_qty': product.force_min_qty
+        if share_product_id:
+            product = product_template.sudo().browse(int(share_product_id))
+            return {
+                product.id: {
+                    'list_price': product.list_price,
+                    'min_qty': product.minimum_quantity,
+                    'force_min_qty': product.force_min_qty
+                    }
                 }
-            }
+        else:
+            return False
 
     @http.route(['/subscription/subscribe_share'],
                 type='http',
