@@ -25,7 +25,7 @@ $(document).ready(function () {
 	    });
 	    
 	    $(oe_easymy_coop).on('click', 'a.js_add_cart_json', function (ev) {
-	        var $share_price = $('#share_price').text()
+	    	var $share_price = $('#share_price').text()
 	        var $link = $(ev.currentTarget);
 	        var $input = $link.parent().parent().find("input");
 	        var $input_total = $("div").find(".total");

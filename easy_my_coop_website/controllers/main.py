@@ -308,7 +308,8 @@ class WebsiteSubscription(http.Controller):
                 product.id: {
                     'list_price': product.list_price,
                     'min_qty': product.minimum_quantity,
-                    'force_min_qty': product.force_min_qty
+                    'force_min_qty': product.force_min_qty,
+                    'max_amount': product.maximum_amount
                     }
                 }
         else:

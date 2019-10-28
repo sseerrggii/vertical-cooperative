@@ -14,12 +14,14 @@ class ProductTemplate(models.Model):
     short_name = fields.Char(string="Short name")
     display_on_website = fields.Boolean(string="Display on website")
     default_share_product = fields.Boolean(string="Default share product")
-    minimum_quantity = fields.Integer(string="Minimum quantity", default=1)
+    minimum_quantity = fields.Integer(string="Minimum quantity",
+                                      default=1)
+    maximum_amount = fields.Float(string="Maximum amount per share")
     force_min_qty = fields.Boolean(String="Force minimum quantity?")
     by_company = fields.Boolean(string="Can be subscribed by companies?")
     by_individual = fields.Boolean(string="Can be subscribed by individuals?")
     customer = fields.Boolean(string="Become customer")
-    mail_template = fields.Many2one('mail.template',
+    mail_template = fields.Many2one("mail.template",
                                     string="Mail template")
 
     @api.multi

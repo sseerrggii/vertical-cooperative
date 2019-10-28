@@ -26,6 +26,7 @@
                 			<group name="configuration" string="Configuration">
                 				<field name="force_min_qty"/>
 								<field name="minimum_quantity"/>
+								<field name="maximum_amount"/>
 								<field name="customer" attrs="{'invisible':[('is_share','=',False)]}"/>
 								<field name="by_company"/>
 								<field name="by_individual"/>

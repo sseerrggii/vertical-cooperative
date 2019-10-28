@@ -224,7 +224,7 @@
 										                <i class="fa fa-minus"></i>
 										            </a>
 										        </span>
-										        <input type="text" class="js_quantity form-control" data-min="1" name="ordered_parts" t-attf-value="#{ordered_parts or 1}"/>
+										        <input type="number" class="js_quantity form-control" data-min="1" name="ordered_parts" t-attf-value="#{ordered_parts or 1}"/>
 										        <span class="input-group-addon">
 										            <a t-attf-href="#" class="mb8 float_left js_add_cart_json">
 										                <i class="fa fa-plus"></i>
