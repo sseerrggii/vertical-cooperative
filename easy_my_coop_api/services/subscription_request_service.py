@@ -28,6 +28,7 @@ class SubscriptionRequestService(Component):
             "id": sr.id,
             "name": sr.name,
             "email": sr.email,
+            "state": sr.state,
             "date": Date.to_string(sr.date),
             "ordered_parts": sr.ordered_parts,
             "share_product": {
@@ -68,9 +69,32 @@ class SubscriptionRequestService(Component):
             "lang": params["lang"],
         }
 
+    def _prepare_update(self, params):
+        if "address" in params:
+            address = params["address"]
+            if "country" in address:
+                country = self._get_country(address["country"]).id
+                address["country"] = country
+        else:
+            address = {}
+
+        params = {
+            "name": params.get("name"),
+            "email": params.get("email"),
+            "state": params.get("state"),
+            "ordered_parts": params.get("ordered_parts"),
+            "share_product_id": params.get("share_product"),
+            "address": address.get("street"),
+            "zip_code": address.get("zip_code"),
+            "city": address.get("city"),
+            "country_id": address.get("country"),
+            "lang": params.get("lang"),
+        }
+        params = {k: v for k, v in params.items() if v is not None}
+        return params
+
     def get(self, _id):
-        # fixme remove sudo
-        sr = self.env["subscription.request"].sudo().search([("id", "=", _id)])
+        sr = self.env["subscription.request"].search([("id", "=", _id)])
         if sr:
             return self._to_dict(sr)
         else:
@@ -79,7 +103,6 @@ class SubscriptionRequestService(Component):
             )
 
     def search(self, date_from=None, date_to=None):
-        # fixme remove sudo
         _logger.info("search from %s to %s" % (date_from, date_to))
 
         domain = []
@@ -90,7 +113,7 @@ class SubscriptionRequestService(Component):
             date_to = Date.from_string(date_to)
             domain.append(("date", "<=", date_to))
 
-        requests = self.env["subscription.request"].sudo().search(domain)
+        requests = self.env["subscription.request"].search(domain)
 
         response = {
             "count": len(requests),
@@ -101,6 +124,12 @@ class SubscriptionRequestService(Component):
     def create(self, **params):
         params = self._prepare_create(params)
         sr = self.env["subscription.request"].create(params)
+        return self._to_dict(sr)
+
+    def update(self, _id, **params):
+        params = self._prepare_update(params)
+        sr = self.env["subscription.request"].browse(_id)
+        sr.write(params)
         return self._to_dict(sr)
 
     def _validator_get(self):
@@ -128,4 +157,10 @@ class SubscriptionRequestService(Component):
         return schemas.S_SUBSCRIPTION_REQUEST_CREATE
 
     def _validator_return_create(self):
+        return schemas.S_SUBSCRIPTION_REQUEST_GET
+
+    def _validator_update(self):
+        return schemas.S_SUBSCRIPTION_REQUEST_UPDATE
+
+    def _validator_return_update(self):
         return schemas.S_SUBSCRIPTION_REQUEST_GET
