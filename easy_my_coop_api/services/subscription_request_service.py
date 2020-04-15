@@ -16,11 +16,51 @@ _logger = logging.getLogger(__name__)
 class SubscriptionRequestService(Component):
     _inherit = "base.rest.service"
     _name = "subscription.request.services"
-    _usage = "subscription_request"  # service_name
+    # service_name todo subscription-request
+    _usage = "subscription_request"
     _collection = "emc.services"
     _description = """
     Subscription requests
     """
+
+    def get(self, _id):
+        sr = self.env["subscription.request"].search([("id", "=", _id)])
+        if sr:
+            return self._to_dict(sr)
+        else:
+            raise wrapJsonException(
+                NotFound(_("No subscription request for id %s") % _id)
+            )
+
+    def search(self, date_from=None, date_to=None):
+        _logger.info("search from %s to %s" % (date_from, date_to))
+
+        domain = []
+        if date_from:
+            date_from = Date.from_string(date_from)
+            domain.append(("date", ">=", date_from))
+        if date_to:
+            date_to = Date.from_string(date_to)
+            domain.append(("date", "<=", date_to))
+
+        requests = self.env["subscription.request"].search(domain)
+
+        response = {
+            "count": len(requests),
+            "rows": [self._to_dict(sr) for sr in requests],
+        }
+        return response
+
+    def create(self, **params):
+        params = self._prepare_create(params)
+        sr = self.env["subscription.request"].create(params)
+        return self._to_dict(sr)
+
+    def update(self, _id, **params):
+        params = self._prepare_update(params)
+        sr = self.env["subscription.request"].browse(_id)
+        sr.write(params)
+        return self._to_dict(sr)
 
     def _to_dict(self, sr):
         sr.ensure_one()
@@ -93,74 +133,26 @@ class SubscriptionRequestService(Component):
         params = {k: v for k, v in params.items() if v is not None}
         return params
 
-    def get(self, _id):
-        sr = self.env["subscription.request"].search([("id", "=", _id)])
-        if sr:
-            return self._to_dict(sr)
-        else:
-            raise wrapJsonException(
-                NotFound(_("No subscription request for id %s") % _id)
-            )
-
-    def search(self, date_from=None, date_to=None):
-        _logger.info("search from %s to %s" % (date_from, date_to))
-
-        domain = []
-        if date_from:
-            date_from = Date.from_string(date_from)
-            domain.append(("date", ">=", date_from))
-        if date_to:
-            date_to = Date.from_string(date_to)
-            domain.append(("date", "<=", date_to))
-
-        requests = self.env["subscription.request"].search(domain)
-
-        response = {
-            "count": len(requests),
-            "rows": [self._to_dict(sr) for sr in requests],
-        }
-        return response
-
-    def create(self, **params):
-        params = self._prepare_create(params)
-        sr = self.env["subscription.request"].create(params)
-        return self._to_dict(sr)
-
-    def update(self, _id, **params):
-        params = self._prepare_update(params)
-        sr = self.env["subscription.request"].browse(_id)
-        sr.write(params)
-        return self._to_dict(sr)
-
     def _validator_get(self):
-        return {"_id": {"type": "integer"}}
-
-    def _validator_return_get(self):
         return schemas.S_SUBSCRIPTION_REQUEST_GET
 
+    def _validator_return_get(self):
+        return schemas.S_SUBSCRIPTION_REQUEST_RETURN_GET
+
     def _validator_search(self):
-        return {
-            "date_from": {
-                "type": "string",
-                "check_with": schemas.date_validator,
-            },
-            "date_to": {
-                "type": "string",
-                "check_with": schemas.date_validator,
-            },
-        }
+        return schemas.S_SUBSCRIPTION_REQUEST_SEARCH
 
     def _validator_return_search(self):
-        return schemas.S_SUBSCRIPTION_REQUEST_LIST
+        return schemas.S_SUBSCRIPTION_REQUEST_RETURN_SEARCH
 
     def _validator_create(self):
         return schemas.S_SUBSCRIPTION_REQUEST_CREATE
 
     def _validator_return_create(self):
-        return schemas.S_SUBSCRIPTION_REQUEST_GET
+        return schemas.S_SUBSCRIPTION_REQUEST_RETURN_GET
 
     def _validator_update(self):
         return schemas.S_SUBSCRIPTION_REQUEST_UPDATE
 
     def _validator_return_update(self):
-        return schemas.S_SUBSCRIPTION_REQUEST_GET
+        return schemas.S_SUBSCRIPTION_REQUEST_RETURN_GET
