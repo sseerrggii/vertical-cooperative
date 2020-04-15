@@ -14,7 +14,7 @@
     "category": "Cooperative management",
     "website": "www.coopiteasy.be",
     "license": "AGPL-3",
-    "description": """
+    "summary": """
         Open Easy My Coop to the world: RESTful API.
     """,
     "data": [],
