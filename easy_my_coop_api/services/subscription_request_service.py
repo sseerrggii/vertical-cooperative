@@ -24,7 +24,7 @@ class SubscriptionRequestService(Component):
     """
 
     def get(self, _id):
-        sr = self.env["subscription.request"].search([("id", "=", _id)])
+        sr = self.env["subscription.request"].browse(_id)
         if sr:
             return self._to_dict(sr)
         else:
@@ -59,6 +59,10 @@ class SubscriptionRequestService(Component):
     def update(self, _id, **params):
         params = self._prepare_update(params)
         sr = self.env["subscription.request"].browse(_id)
+        if not sr:
+            raise wrapJsonException(
+                NotFound(_("No subscription request for id %s") % _id)
+            )
         sr.write(params)
         return self._to_dict(sr)
 
