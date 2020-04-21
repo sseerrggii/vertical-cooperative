@@ -322,6 +322,11 @@ class TaxShelterCertificate(models.Model):
                 certificate.state = "sent"
             else:
                 certificate.state = "no_eligible"
+            # pylint: disable=invalid-commit
+            # fixme while you're here, please fix the query
+            #  to pass pylint invalid-commit
+            #  Use of cr.commit() directly is VERY BAD
+            #  More info https://github.com/OCA/odoo-community.org/blob/master/website/Contribution/CONTRIBUTING.rst#never-commit-the-transaction  # noqa
             self.env.cr.commit()
 
     @api.multi

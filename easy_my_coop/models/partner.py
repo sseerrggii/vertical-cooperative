@@ -53,15 +53,19 @@ class ResPartner(models.Model):
         from_clause, where_clause, where_clause_params = where_query.get_sql()
 
         # price_total is in the company currency
+        # pylint: disable=sql-injection
+        # fixme while you're here, please fix the query to pass
+        #  pylint sql-injection
         query = (
             """
-                  SELECT SUM(price_total) as total, partner_id
-                    FROM account_invoice_report account_invoice_report
+
+
                    WHERE %s
                    GROUP BY partner_id
                 """
-            % where_clause
+            % where_clause  # fixme
         )
+
         self.env.cr.execute(query, where_clause_params)
         price_totals = self.env.cr.dictfetchall()
         for partner, child_ids in all_partners_and_children.items():
