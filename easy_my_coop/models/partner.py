@@ -52,16 +52,19 @@ class ResPartner(models.Model):
         account_invoice_report._apply_ir_rules(where_query, "read")
         from_clause, where_clause, where_clause_params = where_query.get_sql()
 
-        # price_total is in the company currency
-        # pylint: disable=sql-injection
-        # fixme while you're here, please fix the query to pass
-        #  pylint sql-injection
+        # price_total is in the company currency pylint:
+        # disable=sql-injection
+        # fixme while you're here, please fix the query
+        #  to pass pylint sql-injection
+        #  Note de Houssine: note que c'est la
+        #  surcharge d'une fonction standard de la facturation Odoo. Elle
+        #  date de la 9 voir si la v12 a été adaptée où est équivalente à la 12
         query = (
             """
-
-
-                   WHERE %s
-                   GROUP BY partner_id
+                SELECT SUM(price_total) as total, partner_id
+                FROM account_invoice_report account_invoice_report
+                WHERE %s
+                GROUP BY partner_id
                 """
             % where_clause  # fixme
         )
